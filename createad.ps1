@@ -14,19 +14,14 @@ if (Test-Path $caminhoArquivoTXT) {
 
     # Itera sobre os dados do arquivo TXT para criar os usuários
     foreach ($linha in $dadosUsuarios) {
-        # Divide a linha em nome e sobrenome
-        $nomeSobrenome = $linha -split '\.'
-        $nomeUsuario = $nomeSobrenome[0]
-        $sobrenomeUsuario = $nomeSobrenome[1]
-        
         # Gera uma senha aleatória de 5 dígitos
         $senhaUsuario = Get-Random -Minimum 10000 -Maximum 99999 | ConvertTo-SecureString -AsPlainText -Force
         
-        # Define o SamAccountName combinando nome e sobrenome
-        $samAccountName = "$nomeUsuario$sobrenomeUsuario"
+        # Define o SamAccountName diretamente da linha
+        $samAccountName = ($linha -split '\.').ToLower()
 
         # Cria o novo usuário usando a Unidade Organizacional padrão
-        New-ADUser -SamAccountName $samAccountName -UserPrincipalName "$samAccountName@dominio.com" -Name "$nomeUsuario $sobrenomeUsuario" -GivenName $nomeUsuario -Surname $sobrenomeUsuario -Enabled $true -ChangePasswordAtLogon $true -PasswordNeverExpires $false -OrganizationalUnit $ouPadrao -AccountPassword $senhaUsuario
+        New-ADUser -SamAccountName $samAccountName -UserPrincipalName "$samAccountName@cs.org" -Name $linha -Enabled $true -ChangePasswordAtLogon $true -PasswordNeverExpires $false -Path $ouPadrao -AccountPassword $senhaUsuario
     }
 
     Write-Host "Usuários criados com sucesso."
